@@ -9,8 +9,8 @@
 #include <string>
 #include <string_view>
 
-#include "profile.h"
-#include "duration.h"
+// #include "profile.h"
+// #include "duration.h"
 using namespace std;
 
 class InvertedIndex {

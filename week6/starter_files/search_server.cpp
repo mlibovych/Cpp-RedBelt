@@ -28,20 +28,16 @@ void SearchServer::UpdateDocumentBase(istream& document_input) {
 void SearchServer::AddQueriesStream(
   	istream& query_input, ostream& search_results_output) {
 	vector<pair<size_t, size_t>> search_results;
-	TotalDuration part1("Total part1");
 
 	search_results.reserve(index.getSize());
   	for (string current_query; getline(query_input, current_query); ) {
     	const auto words = SplitIntoWords(current_query);
 
-		search_results.assign(index.getSize(), { 0, 0 });;
-		{
-			ADD_DURATION(part1);
-			for (const auto& word : words) {
-				for (const size_t docid : index.Lookup(word)) {
-					search_results[docid].first = docid;
-					search_results[docid].second++;
-				}
+		search_results.assign(index.getSize() + 1, { 0, 0 });;
+		for (const auto& word : words) {
+			for (const size_t docid : index.Lookup(word)) {
+				search_results[docid].first = docid;
+				search_results[docid].second++;
 			}
 		}
     	partial_sort(
