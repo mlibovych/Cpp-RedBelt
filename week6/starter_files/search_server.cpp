@@ -33,7 +33,7 @@ void SearchServer::AddQueriesStream(
   	for (string current_query; getline(query_input, current_query); ) {
     	const auto words = SplitIntoWords(current_query);
 
-		search_results.assign(index.getSize() + 1, { 0, 0 });;
+		search_results.assign(index.getSize(), { 0, 0 });;
 		for (const auto& word : words) {
 			for (const size_t docid : index.Lookup(word)) {
 				search_results[docid].first = docid;
@@ -42,7 +42,7 @@ void SearchServer::AddQueriesStream(
 		}
     	partial_sort(
 			search_results.begin(),
-			search_results.begin() + 5,
+			search_results.begin() + min<size_t>(5, search_results.size()),
 			search_results.end(),
 			[](pair<size_t, size_t> lhs, pair<size_t, size_t> rhs) {
 				int64_t lhs_docid = lhs.first;

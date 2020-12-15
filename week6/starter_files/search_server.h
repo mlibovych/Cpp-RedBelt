@@ -7,6 +7,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <algorithm>
 #include <string_view>
 
 // #include "profile.h"
