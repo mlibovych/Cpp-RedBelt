@@ -1,11 +1,10 @@
-#include "test_runner.h"
+// #include "test_runner.h"
 #include <algorithm>
 #include <iostream>
 #include <iterator>
 #include <memory>
 #include <set>
-#include <list>
-// #include <utility>
+#include <utility>
 #include <vector>
 
 using namespace std;
@@ -26,6 +25,14 @@ bool operator<(const Item<T>& lhs, const Item<T>& rhs) {
 }
 
 template <typename T>
+bool operator==(const Item<T>& lhs, const Item<T>& rhs) {
+   if(lhs.priority != rhs.priority || lhs.id != rhs.id || lhs.data != rhs.data) {
+     return 0;
+   }
+    return 1;
+}
+
+template <typename T>
 class PriorityCollection {
 public:
     using Id = typename set<Item<T>>::iterator;
@@ -37,14 +44,16 @@ public:
     template <typename ObjInputIt, typename IdOutputIt>
     void Add(ObjInputIt range_begin, ObjInputIt range_end,
         	IdOutputIt ids_begin) {
-		std::move(range_begin, range_end, ids_begin);
+		while (range_begin != range_end) {
+      		*ids_begin++ = Add(move(*range_begin++));
+		}
 	}
 
     bool IsValid(Id id) const {
-		if (std::find(elements.begin(), elements.end(), *id) != elements.end()) {
-			return 1;
+		if(find(elements.begin(), elements.end(), *id) != elements.end()) {
+			return true;
 		}
-		return 0;
+		return false;
 	}
 
 
@@ -61,7 +70,8 @@ public:
     }
 
     pair<const T&, int> GetMax() const {
-		return std::make_pair((*prev(elements.end())).data, (*prev(elements.end())).priority);
+		const auto item = prev(elements.end());
+		return {item->data, item->priority};
     }
 
     pair<T, int> PopMax() {
@@ -71,13 +81,6 @@ public:
 
 		return result;
     }
-
-	void printCol() {
-		for (const auto& item : elements) {
-			std::cout << item.data << item.priority << std::endl;
-		}
-		std::cout << "----" << std::endl;
-	}
 
 private:
     std::set<Item<T>> elements;
@@ -93,39 +96,46 @@ public:
   StringNonCopyable& operator=(StringNonCopyable&&) = default;
 };
 
-void TestNoCopy() {
-  PriorityCollection<StringNonCopyable> strings;
-  const auto white_id = strings.Add("white");
-  const auto yellow_id = strings.Add("yellow");
-  const auto red_id = strings.Add("red");
+// void TestNoCopy() {
+//   PriorityCollection<StringNonCopyable> strings;
+//   const auto white_id = strings.Add("white");
+//   const auto yellow_id = strings.Add("yellow");
+//   const auto red_id = strings.Add("red");
 
-  strings.Promote(yellow_id);
-  for (int i = 0; i < 2; ++i) {
-    strings.Promote(red_id);
-  }
+//   auto a = white_id;
 
-  strings.Promote(yellow_id);
-//   std::cout << strings.Get(red_id) << std::endl;
-//   strings.printCol();
-  {
-    const auto item = strings.PopMax();
-    ASSERT_EQUAL(item.first, "red");
-    ASSERT_EQUAL(item.second, 2);
-  }
-  {
-    const auto item = strings.PopMax();
-    ASSERT_EQUAL(item.first, "yellow");
-    ASSERT_EQUAL(item.second, 2);
-  }
-  {
-    const auto item = strings.PopMax();
-    ASSERT_EQUAL(item.first, "white");
-    ASSERT_EQUAL(item.second, 0);
-  }
-}
+//   strings.Promote(yellow_id);
+//   for (int i = 0; i < 2; ++i) {
+//     strings.Promote(red_id);
+//   }
+//   if(strings.IsValid(red_id)) {
+//     cout << "aaa" << endl;
+//   }
 
-int main() {
-  TestRunner tr;
-  RUN_TEST(tr, TestNoCopy);
-  return 0;
-}
+//   strings.Promote(yellow_id);
+//   strings.GetMax();
+//   {
+//     const auto item = strings.PopMax();
+//     ASSERT_EQUAL(item.first, "red");
+//     ASSERT_EQUAL(item.second, 2);
+//   }
+//   if(strings.IsValid(red_id)) {
+//     cout << "aaa" << endl;
+//   }
+//   {
+//     const auto item = strings.PopMax();
+//     ASSERT_EQUAL(item.first, "yellow");
+//     ASSERT_EQUAL(item.second, 2);
+//   }
+//   {
+//     const auto item = strings.PopMax();
+//     ASSERT_EQUAL(item.first, "white");
+//     ASSERT_EQUAL(item.second, 0);
+//   }
+// }
+
+// int main() {
+//   TestRunner tr;
+//   RUN_TEST(tr, TestNoCopy);
+//   return 0;
+// }
