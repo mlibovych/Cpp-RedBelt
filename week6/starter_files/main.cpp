@@ -49,10 +49,17 @@ void TestFunctionality(
   istringstream docs_input(Join('\n', docs));
   istringstream queries_input(Join('\n', queries));
 
+  std::chrono::milliseconds dura( 2000 );
+
   SearchServer srv;
   srv.UpdateDocumentBase(docs_input);
+
+  std::this_thread::sleep_for(dura);
+
   ostringstream queries_output;
   srv.AddQueriesStream(queries_input, queries_output);
+
+  std::this_thread::sleep_for(dura);
 
   const string result = queries_output.str();
   const auto lines = SplitBy(Strip(result), '\n');
@@ -66,14 +73,16 @@ void TestSerpFormat() {
 	SearchServer srv;
 	istringstream docs_input1(Join('\n', generateVector()));
 	vector<string> queries = generateQuery(200);
-	istringstream queries_input(Join('\n', queries));
+	istringstream queries_input1(Join('\n', queries));
+  istringstream queries_input2(Join('\n', queries));
+  istringstream queries_input3(Join('\n', queries));
+
+  srv.UpdateDocumentBase(docs_input1);
+  LOG_DURATION("add query")
 	{
-		LOG_DURATION("update1")
-  		srv.UpdateDocumentBase(docs_input1);
-	}
-	{
-		LOG_DURATION("add query")
-		srv.AddQueriesStream(queries_input, cout);
+		srv.AddQueriesStream(queries_input1, cout);
+    srv.AddQueriesStream(queries_input2, cout);
+    srv.AddQueriesStream(queries_input3, cout);
 	}
 
 }

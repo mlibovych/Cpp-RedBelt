@@ -9,8 +9,9 @@
 #include <string>
 #include <algorithm>
 #include <string_view>
+#include <future>
 
-// #include "profile.h"
+#include "synchronized.h"
 // #include "duration.h"
 using namespace std;
 
@@ -39,5 +40,6 @@ public:
 	void AddQueriesStream(istream& query_input, ostream& search_results_output);
 
 private:
-  	InvertedIndex index;
+  	Synchronized<InvertedIndex> index;
+	vector<future<void>> futures;
 };

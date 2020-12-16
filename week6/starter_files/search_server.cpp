@@ -15,27 +15,32 @@ SearchServer::SearchServer(istream& document_input) {
   	UpdateDocumentBase(document_input);
 }
 
-void SearchServer::UpdateDocumentBase(istream& document_input) {
+void UpdateDocumentBaseSingle(istream& document_input, Synchronized<InvertedIndex>& index_handle) {
 	InvertedIndex new_index;
 
 	for (string current_document; getline(document_input, current_document); ) {
 		new_index.Add(move(current_document));
 	}
 
-	index = move(new_index);
+	swap(index_handle.GetAccess().ref_to_value, new_index);
 }
 
-void SearchServer::AddQueriesStream(
-  	istream& query_input, ostream& search_results_output) {
-	vector<pair<size_t, size_t>> search_results;
+void SearchServer::UpdateDocumentBase(istream& document_input) {
+	futures.push_back(async(UpdateDocumentBaseSingle, ref(document_input), ref(index)));
+}
 
-	search_results.reserve(index.getSize());
+void AddQueriesStreamSingle(
+  	istream& query_input, ostream& search_results_output, Synchronized<InvertedIndex>& index_handle) {
+	vector<pair<size_t, size_t>> search_results;
+	auto access = index_handle.GetAccess();
+
+	search_results.reserve(access.ref_to_value.getSize());
   	for (string current_query; getline(query_input, current_query); ) {
     	const auto words = SplitIntoWords(current_query);
 
-		search_results.assign(index.getSize(), { 0, 0 });;
+		search_results.assign(access.ref_to_value.getSize(), { 0, 0 });;
 		for (const auto& word : words) {
-			for (const size_t docid : index.Lookup(word)) {
+			for (const size_t docid : access.ref_to_value.Lookup(word)) {
 				search_results[docid].first = docid;
 				search_results[docid].second++;
 			}
@@ -63,6 +68,12 @@ void SearchServer::AddQueriesStream(
 		}
     	search_results_output << endl;
   	}
+}
+
+
+void SearchServer::AddQueriesStream(
+  	istream& query_input, ostream& search_results_output) {
+	futures.push_back(async(AddQueriesStreamSingle, ref(query_input), ref(search_results_output), ref(index)));
 }
 
 void InvertedIndex::Add(const string& document) {
