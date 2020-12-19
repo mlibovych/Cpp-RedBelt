@@ -6,19 +6,25 @@
 #include <list>
 #include <vector>
 #include <map>
+#include <unordered_map>
 #include <string>
 #include <algorithm>
 #include <string_view>
 #include <future>
+#include <deque>
+#include <numeric>
 
 #include "synchronized.h"
-// #include "duration.h"
+
 using namespace std;
 
 class InvertedIndex {
 public:
+	InvertedIndex() = default;
+	InvertedIndex(istream& document_input);
+
 	void Add(const string& document);
-	list<size_t> Lookup(const string& word) const;
+	const vector<pair<size_t, size_t>> &Lookup(string_view word) const;
 
 	const string& GetDocument(size_t id) const {
 		return docs[id];
@@ -28,8 +34,8 @@ public:
 	}
 
 private:
-	map<string, list<size_t>> index;
-	vector<string> docs;
+	unordered_map<string_view, vector<pair<size_t, size_t>>> index;
+	deque<string> docs;
 };
 
 class SearchServer {

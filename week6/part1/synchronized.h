@@ -1,12 +1,7 @@
 #include "test_runner.h"
 
-#include <numeric>
-#include <vector>
-#include <string>
-#include <future>
 #include <mutex>
-#include <queue>
-#include <thread>
+
 using namespace std;
 
 template <typename T>
