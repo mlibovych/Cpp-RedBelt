@@ -85,7 +85,6 @@ Stats ExploreKeyWordsSingleThread(
 ) {
   Stats result;
   for (string line; getline(input, line); ) {
-	//   std::cout << line << std::endl;
     result += ExploreLine(key_words, line);
   }
   return result;
@@ -96,7 +95,6 @@ Stats ExploreKeyWordsSingleThreadMy(
   Stats result;
 
   for (auto it = vec.begin(); it != vec.end(); ++it) {
-    //   std::cout << *it << "aaa" << std::endl;
     result += ExploreLine(key_words, *it);
   }
   return result;

@@ -77,7 +77,9 @@ void TestAbsentParts() {
     {"unknown", 0},
   };
   const Stats default_constructed;
-
+  for (const auto &[key, value] : default_constructed.GetMethodStats()) {
+    std::cout << key << std::endl;
+  }
   ASSERT_EQUAL(default_constructed.GetMethodStats(), expected_method_count);
   ASSERT_EQUAL(default_constructed.GetUriStats(), expected_url_count);
 }

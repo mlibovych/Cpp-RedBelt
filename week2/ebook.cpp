@@ -29,10 +29,10 @@ public:
 				}
 			}
 		}
-		// for (int i = 0; i < 20; ++i) {
-		// 	cout << " " << page_users[i];
-		// }
-		// cout << endl;
+		for (int i = 0; i < 20; ++i) {
+			cout << " " << page_users[i];
+		}
+		cout << endl;
 		user_pages[user_id] = page_count;
   	}
 
@@ -45,7 +45,7 @@ public:
 		}
 		else {
 			double users = page_users[user_pages.at(user_id) - 1];
-			// cout <<  "users " << users  << endl;
+			cout <<  "users " << users  << endl;
 
 			return users / (user_pages.size() - 1);
 		}
@@ -80,5 +80,4 @@ int main() {
 
   return 0;
 }
-
 

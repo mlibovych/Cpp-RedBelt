@@ -2,7 +2,7 @@
 
 #include <map>
 #include <vector>
-#include <iostream>
+#include <iostream> 
 #include <string_view>
 #include <algorithm>
 using namespace std;
@@ -30,26 +30,23 @@ const map<string_view, int>& Stats::GetUriStats() const {
     return uri_count;
 }
 
-HttpRequest ParseRequest(string_view line)  {
-    HttpRequest result;
-    std::vector<string_view> parts;
+void LeftStrip(string_view& sv) {
+  while (!sv.empty() && isspace(sv[0])) {
+    sv.remove_prefix(1);
+  }
+}
 
-    if (std::count(line.begin(), line.end(), '/') != 2) {
-        return result;
-    }
-    parts.reserve(3);
-    for (int i = 0; i < 3; ++i) {
-        size_t space;
-        string_view part;
+string_view ReadToken(string_view& sv) {
+  LeftStrip(sv);
 
-        line.remove_prefix(line.find_first_not_of(' '));
-        space = line.find(' ');
-        part = line.substr(0, space);
-        parts.push_back(part);
-        line.remove_prefix(space + 1);
-    }
-    result.method = parts[0];
-    result.uri = parts[1];
-    result.protocol = parts[2];
-    return result;
+  auto pos = sv.find(' ');
+  auto result = sv.substr(0, pos);
+  sv.remove_prefix(pos != sv.npos ? pos : sv.size());
+  return result;
+}
+
+HttpRequest ParseRequest(string_view line) {
+  auto method = ReadToken(line);
+  auto uri = ReadToken(line);
+  return {method, uri, ReadToken(line)};
 }
